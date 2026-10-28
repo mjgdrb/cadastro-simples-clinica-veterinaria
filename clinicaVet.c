@@ -4,7 +4,8 @@
 #include <stdbool.h>
 
 typedef struct{
-
+    
+    //Animal
     char Especie[50];
     char Nome[50];
     int Idade;
@@ -12,12 +13,15 @@ typedef struct{
     char Raça[50];
     float Peso;
     float Altura;
-    bool castrado;
+    bool castrado;              // [true] castrado [false] não castrado
 
+
+    //Dono
     char NomeDono[50];
     int IdadeDono;
     int TelefoneDono;
 
+    //Opcionais
     char Porte[50];
     char Cor[50];
     char Pelagem[50];
@@ -34,7 +38,7 @@ void fecharArquivo(){
 
 
 
-    
+
 }
 
 void fazerCadastro(){
