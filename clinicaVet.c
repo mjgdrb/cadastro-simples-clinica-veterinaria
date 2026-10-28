@@ -16,10 +16,13 @@ typedef struct{
     char Raça[50];
     float Peso;
     float Altura;
-    bool castrado;              // [true] castrado [false] não castrado
+    bool Castrado;              // [true] castrado [false] não castrado
 
+/*
 
-    //Dono
+ -> vou adicionar essa parte depois
+
+ //Dono
     char NomeDono[50];
     int IdadeDono;
     int TelefoneDono;
@@ -29,40 +32,48 @@ typedef struct{
     char Cor[50];
     char Pelagem[50];
 
+*/
+   
+
 }Paciente;
 
-int criarArquivo(){
+void criarArquivo(){
 
     FILE *arquivo = fopen("dados.csv", "w");
     if(arquivo == NULL){
         printf("--- Erro ao criar arquivo. ---");
-        return 1;
+        parar = true;
+        return;
     }
+
+    fprintf(arquivo, "Espécie,Nome,Idade,Sexo,Raça,Peso,Altura,Castrado\n");
 
     fclose(arquivo);
     printf("Arquivo CSV criado com sucesso!\n");
-
 }
 
-int fazerCadastro(){
+void fazerCadastro(){
     
+// ainda irei fazer
+
+}
+
+void atualizarCadastro(){
+
+// ainda irei fazer
 
 
 }
 
-int atualizarCadastro(){
 
-
-
-}
-
-
-int imprimirCadastros(){
+void imprimirCadastros(){
 
     FILE *arquivo = fopen("dados.csv", "r");
+
     if(arquivo == NULL){
-        printf("--- Erro ao ler arquivo. ---");
-        return 1;
+        printf("--- Erro ao ler arquivo. ---\n");
+        parar = true;
+        return;
     }
 
     char linha[700];
@@ -76,40 +87,35 @@ int imprimirCadastros(){
 
         token = strtok(linha, ","); // Espécie
 
-        printf("Espécie: %30s | ", token);
+        printf("Espécie: %s | ", token);
 
         token = strtok(NULL, ","); // Nome
 
-        printf("Nome: %50s | ", token);
+        printf("Nome: %s | ", token);
 
         token = strtok(NULL, ","); // Idade
 
-        printf("Idade: %3d | ", token);
+        printf("Idade: %s | ", token);
 
         token = strtok(NULL, ","); // Sexo
 
-        printf("Sexo: %3s | ", token);
+        printf("Sexo: %s | ", token);
 
         token = strtok(NULL, ","); // Raça
 
-        printf("Raça: %30s | ", token);
+        printf("Raça: %s | ", token);
 
         token = strtok(NULL, ","); // Peso
 
-        printf("Peso: %.2f | ", token);
+        printf("Peso: %s | ", token);
 
         token = strtok(NULL, ","); // Altura
 
-        printf("Altura: %.2f | ", token);
+        printf("Altura: %s | ", token);
 
-        token = strtok(NULL, "\n"); 
+        token = strtok(NULL, "\n"); // Castrado
 
-        if(token == 0){
-            printf("Castrado: SIM\n");  // Castrado
-        }
-        else{
-            printf("Castrado: NÃO\n");  // Não Castrado
-        }
+        printf("Castrado: %s\n", token);
         
     }
 
@@ -119,8 +125,9 @@ int imprimirCadastros(){
 }
 
 
-int apagarCadastro(){
+void apagarCadastro(){
 
+// ainda irei fazer
 
 
 }
@@ -150,7 +157,7 @@ bool pegarOpcao(){
         return false;
     }
 
-    if (opcao != 1 || opcao != 2 || opcao != 3 || opcao != 4 || opcao != 5 ||opcao != 6){
+    if ((opcao < 1) || (opcao > 6)){
         printf("=== ENTRADA INVALIDA! ===\n");
         return false;
     }
@@ -168,10 +175,8 @@ int main(){
         if(!pegarOpcao()){
             continue;
         }
-    }
 
-    switch (opcao)
-    {
+        switch (opcao){
     case 1:             // Criar Arquivo
         criarArquivo();
         break;
@@ -193,6 +198,7 @@ int main(){
     default:            // Erro
         printf("=== OPÇÃO INVÁLIDA ===");
         break;
+        }
     }
 
 
