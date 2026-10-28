@@ -47,8 +47,15 @@ void criarArquivo(){
 void fazerCadastro(){
     
 
-    
+
 }
+
+void atualizarCadastro(){
+
+
+
+}
+
 
 void imprimirCadastros(){
 
@@ -111,11 +118,6 @@ void imprimirCadastros(){
 
 }
 
-void atualizarCadastro(){
-
-
-
-}
 
 void apagarCadastro(){
 
