@@ -31,7 +31,7 @@ typedef struct{
 
 }Paciente;
 
-void criarArquivo(){
+int criarArquivo(){
 
     FILE *arquivo = fopen("dados.csv", "w");
     if(arquivo == NULL){
@@ -44,20 +44,20 @@ void criarArquivo(){
 
 }
 
-void fazerCadastro(){
+int fazerCadastro(){
     
 
 
 }
 
-void atualizarCadastro(){
+int atualizarCadastro(){
 
 
 
 }
 
 
-void imprimirCadastros(){
+int imprimirCadastros(){
 
     FILE *arquivo = fopen("dados.csv", "r");
     if(arquivo == NULL){
@@ -119,7 +119,7 @@ void imprimirCadastros(){
 }
 
 
-void apagarCadastro(){
+int apagarCadastro(){
 
 
 
