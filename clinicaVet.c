@@ -185,7 +185,7 @@ void escreverCadastro(){
 
 void cadastrarPaciente(){
 
-    printf("=== CADASTRO DE PACIENTE ===");
+    printf("=== CADASTRO DE PACIENTE ===\n");
 
     receberCadastro();
     escreverCadastro();
@@ -230,7 +230,7 @@ void imprimirCadastros(){
 
 
         if (especie && nome && idade && sexo && raca && peso && altura && castrado) {
-            printf("\nPaciente #%d\n", contador++);
+            printf("\nPaciente #%d\n\n", contador++);
             printf("  Espécie:  %s\n", especie);
             printf("  Nome:     %s\n", nome);
             printf("  Idade:    %s\n", idade);
@@ -264,10 +264,15 @@ void limparTela(){
 
 void pausar() {
     #ifdef _WIN32
-        Sleep(2000); // Windows usa milissegundos nativamente
+        Sleep(2000); 
     #else
-        usleep(2000 * 1000); // Linux/macOS usa microssegundos (1 ms = 1000 us)
+        usleep(2000 * 1000); 
     #endif
+}
+
+void transicao(){
+    pausar();
+    limparTela();
 }
 
 
@@ -286,38 +291,32 @@ int main(){
 
         switch (opcao){
             case 1:             // Cadastrar Paciente
-                pausar();
-                limparTela();
+                transicao();
                 cadastrarPaciente();
-                limparTela();
+                transicao();
                 break;
             case 2:             // Atualizar Cadastro
-                pausar();
-                limparTela();
+                transicao();
                 atualizarCadastro();
-                limparTela();
+                transicao();
                 break;
             case 3:             // Imprimir Cadastros
-                pausar();
-                limparTela();
+                transicao();
                 imprimirCadastros();
                 break;
             case 4:             // Apagar Cadastro
-                pausar();
-                limparTela();
+                transicao();
                 apagarCadastro();
-                limparTela();
+                transicao();
                 break;
             case 0:             // Sair
-                printf("Saindo ...");
-                pausar();
-                limparTela();
+                printf("\nSaindo ...");
+                transicao();
                 parar = true;
                 break;
             default:            // Erro
                 printf("=== OPÇÃO INVÁLIDA ===");
-                pausar();
-                limparTela();
+                transicao();
                 break;
                 }
     }
