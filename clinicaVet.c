@@ -58,7 +58,7 @@ void menu(){
 
 bool pegarOpcao(){
 
-    printf("Insira a opção desejada: ");
+    printf("\nInsira a opção desejada: ");
 
     if (scanf("%d", &opcao) != 1) { 
         printf("\n=== ENTRADA INVALIDA! DIGITE APENAS NUMEROS. ===\n");
@@ -73,7 +73,7 @@ bool pegarOpcao(){
 
 void receberCadastro(){
 
-    printf("Insira a Espécie: ");
+    printf("\nInsira a Espécie: ");
     if(fgets(paciente.Especie, sizeof(paciente.Especie), stdin)){
         paciente.Especie[strcspn(paciente.Especie, "\n")] = '\0';
     }
@@ -289,11 +289,13 @@ int main(){
                 pausar();
                 limparTela();
                 cadastrarPaciente();
+                limparTela();
                 break;
             case 2:             // Atualizar Cadastro
                 pausar();
                 limparTela();
                 atualizarCadastro();
+                limparTela();
                 break;
             case 3:             // Imprimir Cadastros
                 pausar();
@@ -304,10 +306,11 @@ int main(){
                 pausar();
                 limparTela();
                 apagarCadastro();
+                limparTela();
                 break;
             case 0:             // Sair
-                pausar();
                 printf("Saindo ...");
+                pausar();
                 limparTela();
                 parar = true;
                 break;
