@@ -2,6 +2,10 @@
 
 -> Cadastro de pacientes de uma clínica veterinária
 
+Linguagem C
+
+Struct, CSV, Diferentes SO
+
 DADOS
 
 * Informações Animal
@@ -9,16 +13,15 @@ DADOS
 - Espécie
 - Nome
 - Idade
-- Sexo  (F fêmea ou M macho)
+- Sexo  /fêmea ou macho
 - Raça
 - Peso
 - Altura
-- Castrado (true ou false)
+- Castrado /castrado ou nao castrado
 
 * Informações Dono
 
 - Nome dono
-- Idade dono
 - Telefone dono
 
 * Opcionais
