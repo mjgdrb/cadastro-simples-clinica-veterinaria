@@ -10,6 +10,7 @@ INFORMAÇÕES DO PROJETO
 
 TAREFAS PENDENTES
 
+- tirar altura
 - tratamento de erros em caso de fechar o programa no meio de uma operação
 - função atualizar cadastro
 - função excluir cadastro
@@ -29,19 +30,13 @@ DADOS
   - Sexo  /fêmea ou macho
   - Raça
   - Peso
-  - Altura
+  - Altura ***tirar
   - Castrado /castrado ou nao castrado
 
 * Informações Dono
 
   - Nome dono
   - Telefone dono
-
-* Opcionais
-
-  - Porte
-  - Cor
-  - Pelagem
 
 OPÇÕES
   
