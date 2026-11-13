@@ -25,7 +25,6 @@ typedef struct{
     char Sexo[10];                  // Femea / Macho
     char Raca[50];
     char Peso[30];                  
-    char Altura[30];
     char Castrado[30];              // Castrado / Nao castrado
 
 }Paciente;
@@ -110,17 +109,11 @@ void receberCadastro(){
         paciente.Peso[strcspn(paciente.Peso, "\n")] = '\0';
     }
 
-    printf("Insira a Altura e Medida (ex: 50 cm, 1,05 m): ");
-    if(fgets(paciente.Altura, sizeof(paciente.Altura), stdin)){
-        paciente.Altura[strcspn(paciente.Altura, "\n")] = '\0';
-    }
-
     do{
         printf("É castrado? ([S] para Sim [N] para Não): ");
         scanf(" %c", &tempCastrado);
         while(getchar() != '\n');
     }while(tempCastrado != 'S' && tempCastrado != 's' && tempCastrado != 'N' && tempCastrado != 'n');
-
 
     strcpy(paciente.Castrado, (tempCastrado == 'S' || tempCastrado == 's') ? "Castrado" : "Nao Castrado");
 
@@ -153,7 +146,7 @@ void escreverCadastro(){
             return;
         }
 
-        fprintf(arquivo, "Especie,Nome,Idade,Sexo,Raca,Peso,Altura,Castrado\n");
+        fprintf(arquivo, "Especie,Nome,Idade,Sexo,Raca,Peso,Castrado\n");
         fclose(arquivo);
     }
 
@@ -164,14 +157,13 @@ void escreverCadastro(){
         }
 
 
-    fprintf(arquivo,"%s,%s,%s,%s,%s,%s,%s,%s\n",
+    fprintf(arquivo,"%s,%s,%s,%s,%s,%s,%s\n",
          paciente.Especie,
          paciente.Nome, 
          paciente.Idade, 
          paciente.Sexo, 
          paciente.Raca, 
          paciente.Peso, 
-         paciente.Altura, 
          paciente.Castrado);
 
     fclose(arquivo);
@@ -225,7 +217,6 @@ void imprimirCadastros(){
         char *sexo     = strtok(NULL, ",");
         char *raca     = strtok(NULL, ",");
         char *peso     = strtok(NULL, ",");
-        char *altura   = strtok(NULL, ",");
         char *castrado = strtok(NULL, ",");
 
 
@@ -237,7 +228,6 @@ void imprimirCadastros(){
             printf("  Sexo:     %s\n", sexo);
             printf("  Raça:     %s\n", raca);
             printf("  Peso:     %s\n", peso);
-            printf("  Altura:   %s\n", altura);
             printf("  Castrado?: %s\n", castrado);
             printf("-------------------------------------------------------------\n");
         }
