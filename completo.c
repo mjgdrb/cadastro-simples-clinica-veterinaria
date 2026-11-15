@@ -134,7 +134,7 @@ char lerCharValido(const char *prompt, const char *opcoesValidas, const char *me
     char c, extra;
 
     while (true) {
-        printf(CIANO "%s" RESET, prompt);
+        printf(AMARELO "%s" RESET, prompt);
         if (fgets(buffer, sizeof(buffer), stdin) == NULL) {
             continue;
         }
@@ -476,7 +476,7 @@ bool atualizarCadastro() {
         return false;
     }
 
-    printf(MAGENTA "\n=== ATUALIZAR CADASTRO ===\n" RESET);
+    printf(MAGENTA "\n=== ATUALIZAR CADASTRO ===\n\n" RESET);
     int idx = buscarIndicePaciente(lista, total, "atualizar");
 
     if (idx < 0) {
@@ -489,7 +489,7 @@ bool atualizarCadastro() {
     bool salvarAlteracoes = false;
 
     while (editando) {
-        printf(MAGENTA "\n=== EDITANDO PACIENTE: %s ===\n" RESET, lista[idx].Nome);
+        printf(AMARELO "\n=== EDITANDO PACIENTE: %s ===\n" RESET, lista[idx].Nome);
         imprimirCardPaciente(idx + 1, lista[idx]);
 
         printf(MAGENTA "\t1" RESET " - Espécie\n");
@@ -500,7 +500,7 @@ bool atualizarCadastro() {
         printf(MAGENTA "\t6" RESET " - Peso\n");
         printf(MAGENTA "\t7" RESET " - Castrado?\n");
         printf(MAGENTA "\t8" RESET " - Atualizar TODOS os campos\n");
-        printf(MAGENTA "\t9" RESET " - Concluir e salvar alterações\n");
+        printf(VERDE "\t9" RESET " - Concluir e salvar alterações\n");
         printf(VERMELHO "\t0" RESET " - Sair e desfazer todas as alterações\n\n");
 
         int campo = lerInteiroValido("Qual informação deseja alterar? ", 0, 9);
@@ -627,7 +627,7 @@ void imprimirCadastros() {
     }
 
     printf(MAGENTA "\n=== PACIENTES CADASTRADOS ===\n" RESET);
-    printf(CIANO "Total de registros: %d\n" RESET, total);
+    printf(AZUL "Total de registros: %d\n" RESET, total);
 
     for (int i = 0; i < total; i++) {
         imprimirCardPaciente(i + 1, lista[i]);
@@ -649,7 +649,7 @@ void pesquisarPaciente() {
     char termoBusca[50];
 
     printf(MAGENTA "\n=== PESQUISAR PACIENTE ===\n" RESET);
-    printf("\t" MAGENTA "1" RESET " - Pesquisar por Nome\n");
+    printf("\t" AZUL "1" RESET " - Pesquisar por Nome\n");
     printf("\t" AZUL "2" RESET " - Pesquisar por Espécie\n");
     printf("\t" VERMELHO "0" RESET " - Voltar ao menu\n\n");
 
@@ -721,7 +721,7 @@ bool apagarCadastro() {
     );
 
     if (confirma != 'S' && confirma != 's') {
-        printf(CIANO "\nOperação cancelada. Nenhum dado foi apagado.\n" RESET);
+        printf(VERMELHO "\nOperação cancelada. Nenhum dado foi apagado.\n" RESET);
         return true;
     }
 
@@ -802,7 +802,6 @@ int main() {
                 break;
             case 0: // Sair
                 printf(VERDE "\nSaindo do sistema... Até logo!\n" RESET);
-                transicao();
                 parar = true;
                 break;
         }

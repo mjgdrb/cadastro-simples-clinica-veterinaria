@@ -1,3 +1,2 @@
-Especie,Nome,Idade,Sexo,Raca,Peso,Altura,Castrado
-Coelho,Rose,5 anos,Femea,Nao Informado,4kg,50cm,Nao Castrado
-Gato,Maria,Nao Informado,Femea,vira lata,4kg,40cm,Castrado
+Especie,Nome,Idade,Sexo,Raca,Peso,Castrado
+Ratp,Mouse,1,Macho,Sem,0,Castrado
