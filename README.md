@@ -1,4 +1,4 @@
-# cadastro-simples-clinica-veterinaria
+# cadastro-cadastro-clinica-veterinaria
 
 INFORMAÇÕES DO PROJETO
 
