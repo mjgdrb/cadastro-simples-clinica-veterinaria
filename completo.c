@@ -757,7 +757,7 @@ void transicao() {
 
 // FUNÇÃO PRINCIPAL
 int main() {
-    setlocale(LC_ALL, "Portuguese_Brazil.UTF-8");
+    setlocale(LC_ALL, "portuguese");
     ativarCoresWindows();
 
     printf(VERDE "\n\t========================================\n");
