@@ -10,13 +10,13 @@ INFORMAÇÕES DO PROJETO
 
 TAREFAS PENDENTES
 
-- tirar altura
+- adicionar informacoes do dono
 - tratamento de erros em caso de fechar o programa no meio de uma operação
 - função atualizar cadastro
 - função excluir cadastro
 - imprimir por categorias e poder pesquisar paciente
 - sair da impressao quando pressionar uma tecla especifica
-- poder cancelar o cadastro e atualizacao ao escrever exit em alguma opção
+- poder cancelar o cadastro e atualizacao ao escrever cancel em alguma opção
 - verificacao de duas etapas ao excluir cadastro
 - poder pressionar enter em qualquer dado para ser salvo como "Nao Informado"
 
@@ -30,7 +30,6 @@ DADOS
   - Sexo  /fêmea ou macho
   - Raça
   - Peso
-  - Altura ***tirar
   - Castrado /castrado ou nao castrado
 
 * Informações Dono
