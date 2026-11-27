@@ -1,2 +1,3 @@
-Especie,Nome,Idade,Sexo,Raca,Peso,Castrado
-Rato,Mouse,1,Macho,Sem,0,Castrado
+Codigo,NomeDono,Telefone,Especie,Nome,Idade,Sexo,Raca,Peso,Castrado
+1,Julia,123,Gato,Miausin,1 ano,Femea,Sem,3kg,Nao Castrado
+2,Julia,123,Dog,Dj,1ano,Macho,Nao,3kg,Castrado

@@ -1,28 +1,22 @@
 /* ========================================================================== */
-/*           SISTEMA DE CADASTRO DE PACIENTES PARA CL√çNICA VETERIN√ÅRIA         */
-/* ========================================================================== */
-/* Descri√ß√£o: Sistema em Linguagem C para gerenciamento de pacientes (CRUD),   */
-/* com suporte a persist√™ncia de dados em arquivos texto (CSV), valida√ß√£o de  */
-/* entradas, gera√ß√£o autom√°tica de c√≥digos e interface colorida via terminal. */
+/*           SISTEMA DE CADASTRO DE PACIENTES PARA CLÕNICA VETERIN¡RIA         */
 /* ========================================================================== */
 
 // BIBLIOTECAS UTILIZADAS
-#include <stdio.h>     // Biblioteca padr√£o de entrada e sa√≠da (printf, fgets, fopen, etc.)
-#include <stdbool.h>   // Suporte ao tipo de dado booleano (true/false)
-#include <locale.h>    // Configura√ß√£o de localiza√ß√£o/idioma (acentua√ß√£o em portugu√™s)
-#include <string.h>    // Manipula√ß√£o de strings (strcpy, strcmp, strstr, strlen)
-#include <stdlib.h>    // Fun√ß√µes utilit√°rias (system, etc.)
-#include <ctype.h>     // Fun√ß√µes de manipula√ß√£o de caracteres (tolower, toupper, isalpha)
-#include <time.h>      // Manipula√ß√£o de data/hora para gera√ß√£o autom√°tica de c√≥digos
+#include <stdio.h>     
+#include <stdbool.h>   
+#include <locale.h>    
+#include <string.h>    
+#include <stdlib.h>    
+#include <ctype.h>     
 
-// Configura√ß√£o de compatibilidade para cores no terminal dependendo do Sistema Operacional
 #ifdef _WIN32
     #include <windows.h> 
 #else
     #include <unistd.h>  
 #endif
 
-// DEFINI√á√ÉO DE CORES (ANSI Escape Sequences) PARA O TERMINAL
+// DEFINI«√O DE CORES (ANSI Escape Sequences)
 #define RESET    "\033[0m"
 #define NEGRITO  "\033[1m"
 #define VERMELHO "\033[1;31m"
@@ -33,40 +27,35 @@
 #define CIANO    "\033[1;36m"
 
 // ESTRUTURA DE DADOS (STRUCT) DO PACIENTE
-// Representa o dom√≠nio da aplica√ß√£o com mais de 4 campos de tipos variados
 typedef struct {
-    char Codigo[20];       // Identificador √∫nico no formato AAMMNN (ex: 261101)
-    char NomeDono[50];     // Nome do propriet√°rio do animal
-    char Telefone[30];     // Telefone de contato
-    char Especie[50];      // Esp√©cie do animal (C√£o, Gato, etc.)
-    char Nome[50];         // Nome do animal
-    char Idade[30];        // Idade (ex: "2 anos", "8 meses")            
-    char Sexo[10];         // Sexo ("Femea" ou "Macho")
-    char Raca[50];         // Ra√ßa do animal
-    char Peso[30];         // Peso (ex: "4.5 kg", "300 gramas")                  
-    char Castrado[30];     // Status de castra√ß√£o ("Castrado" ou "Nao Castrado")
+    char Codigo[20];       
+    char NomeDono[50];     
+    char Telefone[30];     
+    char Especie[50];      
+    char Nome[50];         
+    char Idade[30];            
+    char Sexo[10];         
+    char Raca[50];         
+    char Peso[30];                  
+    char Castrado[30];     
 } Paciente;
 
-// VARI√ÅVEIS GLOBAIS DE CONTROLE DO SISTEMA
+// VARI¡VEIS GLOBAIS
 int opcao;
 bool parar = false;
-const char *nomeArquivo = "pacientes.csv";          // Arquivo de persist√™ncia principal (CSV)
-const char *nomeArquivoContador = "contador.txt";   // Arquivo auxiliar para controle de IDs sequenciais
+const char *nomeArquivo = "pacientes.csv";          
+const char *nomeArquivoContador = "contador.txt";   
 FILE *arquivo;
 Paciente paciente;
 
-// ========================================================================== */
-//                     FUN√á√ïES AUXILIARES DE VALIDA√á√ÉO E FORMATA√á√ÉO            */
-// ========================================================================== */
+// FUN«’ES AUXILIARES DE VALIDA«√O E FORMATA«√O
 
-// Converte todos os caracteres de uma string para letras min√∫sculas (auxilia nas buscas)
 void paraMinusculo(char *str) {
     for (int i = 0; str[i]; i++) {
         str[i] = tolower((unsigned char)str[i]);
     }
 }
 
-// Formata strings em Title Case (Ex: "jo√£o silva" vira "Jo√£o Silva") apenas se contiver letras
 void formatarSeApenasLetras(char *str) {
     bool temLetra = false;
 
@@ -75,7 +64,6 @@ void formatarSeApenasLetras(char *str) {
         if (isalpha(c)) {
             temLetra = true;
         } else if (!isspace(c)) {
-            // Se contiver n√∫meros ou s√≠mbolos (ex: "4.5 kg"), n√£o aplica formata√ß√£o de nomes
             return;
         }
     }
@@ -96,18 +84,16 @@ void formatarSeApenasLetras(char *str) {
     }
 }
 
-// Habilita suporte a c√≥digos de cores ANSI nativos no prompt de comando do Windows
 void ativarCoresWindows() {
     #ifdef _WIN32
         HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
         DWORD dwMode = 0;
         GetConsoleMode(hOut, &dwMode);
-        dwMode |= 0x0004; // Habilita ENABLE_VIRTUAL_TERMINAL_PROCESSING
+        dwMode |= 0x0004; 
         SetConsoleMode(hOut, dwMode);
     #endif
 }
 
-// Verifica se o usu√°rio digitou o comando de cancelamento ("cancel")
 bool ehComandoCancelar(const char *entrada) {
     char copia[100];
     strncpy(copia, entrada, sizeof(copia) - 1);
@@ -123,7 +109,6 @@ bool ehComandoCancelar(const char *entrada) {
     return strcmp(inicio, "cancel") == 0;
 }
 
-// L√™ e valida n√∫meros inteiros dentro de um intervalo espec√≠fico (evita loops infinitos)
 int lerInteiroValido(const char *prompt, int min, int max) {
     char buffer[100];
     int valor;
@@ -139,14 +124,13 @@ int lerInteiroValido(const char *prompt, int min, int max) {
             if (valor >= min && valor <= max) {
                 return valor;
             }
-            printf(VERMELHO "=== OP√á√ÉO INV√ÅLIDA! Escolha um n√∫mero entre %d e %d. ===\n\n" RESET, min, max);
+            printf(VERMELHO "=== OP«√O INV¡LIDA! Escolha um n˙mero entre %d e %d. ===\n\n" RESET, min, max);
         } else {
-            printf(VERMELHO "=== ENTRADA INV√ÅLIDA! Digite apenas n√∫meros inteiros. ===\n\n" RESET);
+            printf(VERMELHO "=== ENTRADA INV¡LIDA! Digite apenas n˙meros inteiros. ===\n\n" RESET);
         }
     }
 }
 
-// L√™ um caractere v√°lido restrito a um conjunto de op√ß√µes permitidas
 char lerCharValido(const char *prompt, const char *opcoesValidas, const char *mensagemErro) {
     char buffer[100];
     char c, extra;
@@ -166,7 +150,6 @@ char lerCharValido(const char *prompt, const char *opcoesValidas, const char *me
     }
 }
 
-// L√™ um caractere permitindo a interrup√ß√£o/cancelamento da opera√ß√£o
 char lerCharCancelavel(const char *prompt, const char *opcoesValidas, const char *mensagemErro) {
     char buffer[100];
     char c, extra;
@@ -179,7 +162,7 @@ char lerCharCancelavel(const char *prompt, const char *opcoesValidas, const char
         buffer[strcspn(buffer, "\n")] = '\0';
 
         if (ehComandoCancelar(buffer)) {
-            return '\0'; // Retorna nulo indicando cancelamento
+            return '\0';
         }
 
         if (sscanf(buffer, " %c %c", &c, &extra) == 1) {
@@ -191,7 +174,6 @@ char lerCharCancelavel(const char *prompt, const char *opcoesValidas, const char
     }
 }
 
-// L√™ texto seguro com valida√ß√£o para impedir campos vazios e substitui v√≠rgulas por pontos (para o CSV)
 void lerTextoSeguro(const char *prompt, char *destino, int tamanho) {
     while (true) {
         printf(CIANO "%s" RESET, prompt);
@@ -202,18 +184,17 @@ void lerTextoSeguro(const char *prompt, char *destino, int tamanho) {
 
         for (int i = 0; destino[i]; i++) {
             if (destino[i] == ',') {
-                destino[i] = '.'; // Previne quebra do formato CSV
+                destino[i] = '.';
             }
         }
 
         if (strlen(destino) > 0) {
             return;
         }
-        printf(VERMELHO "=== ESTE CAMPO N√ÉO PODE FICAR VAZIO! ===\n\n" RESET);
+        printf(VERMELHO "=== ESTE CAMPO N√O PODE FICAR VAZIO! ===\n\n" RESET);
     }
 }
 
-// L√™ texto permitindo comando de cancelamento
 bool lerTextoCancelavel(const char *prompt, char *destino, int tamanho) {
     while (true) {
         printf(CIANO "%s" RESET, prompt);
@@ -235,66 +216,42 @@ bool lerTextoCancelavel(const char *prompt, char *destino, int tamanho) {
         if (strlen(destino) > 0) {
             return true;
         }
-        printf(VERMELHO "=== ESTE CAMPO N√ÉO PODE FICAR VAZIO! ===\n\n" RESET);
+        printf(VERMELHO "=== ESTE CAMPO N√O PODE FICAR VAZIO! ===\n\n" RESET);
     }
 }
 
-// ========================================================================== */
-//                 GERENCIAMENTO DE ID E PERSIST√äNCIA EM ARQUIVOS             */
-// ========================================================================== */
-
-// Gera automaticamente o c√≥digo no formato AAMMNN (ex: 261101 = ano 26, mes 11, sequencia 01)
+// GERADOR DE C”DIGO SEQUENCIAL (1, 2, 3...)
 void gerarProximoCodigo(char *codigoDestino) {
-    time_t t = time(NULL);
-    struct tm tm = *localtime(&t);
+    int proximoId = 1;
 
-    int anoAtual = tm.tm_year % 100; // √öltimos 2 d√≠gitos do ano
-    int mesAtual = tm.tm_mon + 1;    // M√™s atual (1 a 12)
-
-    int anoSalvo = 0;
-    int mesSalvo = 0;
-    int sequencia = 0;
-
-    // L√™ o estado atual do contador no arquivo auxiliar
     FILE *fCounter = fopen(nomeArquivoContador, "r");
     if (fCounter != NULL) {
-        fscanf(fCounter, "%d %d %d", &anoSalvo, &mesSalvo, &sequencia);
+        fscanf(fCounter, "%d", &proximoId);
         fclose(fCounter);
     }
 
-    // Se mudou o m√™s ou o ano, reinicia a sequ√™ncia para 1; caso contr√°rio, incrementa
-    if (anoSalvo == anoAtual && mesSalvo == mesAtual) {
-        sequencia++;
-    } else {
-        sequencia = 1; 
-    }
-
-    // Salva o novo estado no arquivo auxiliar
     fCounter = fopen(nomeArquivoContador, "w");
     if (fCounter != NULL) {
-        fprintf(fCounter, "%d %d %d", anoAtual, mesAtual, sequencia);
+        fprintf(fCounter, "%d", proximoId + 1);
         fclose(fCounter);
     }
 
-    // Formata a string final do c√≥digo com zeros √† esquerda (ex: 261101)
-    sprintf(codigoDestino, "%02d%02d%02d", anoAtual, mesAtual, sequencia);
+    sprintf(codigoDestino, "%d", proximoId);
 }
 
-// CARREGAR DADOS DO ARQUIVO CSV PARA O VETOR EM MEM√ìRIA (Read / Inicializa√ß√£o)
 int carregarPacientes(Paciente lista[], int maxItens) {
     arquivo = fopen(nomeArquivo, "r");
     if (arquivo == NULL) {
-        return -1; // Arquivo ainda n√£o existe
+        return -1;
     }
 
     int total = 0;
     char linha[800];
-    fgets(linha, sizeof(linha), arquivo); // Ignora a linha de cabe√ßalho do CSV
+    fgets(linha, sizeof(linha), arquivo); // Pula o cabeÁalho
 
     while (fgets(linha, sizeof(linha), arquivo) && total < maxItens) {
         linha[strcspn(linha, "\n")] = '\0';
 
-        // Faz o parsing da linha separada por v√≠rgulas
         char *codigo   = strtok(linha, ",");
         char *nomeDono = strtok(NULL, ",");
         char *telefone = strtok(NULL, ",");
@@ -322,21 +279,17 @@ int carregarPacientes(Paciente lista[], int maxItens) {
     }
 
     fclose(arquivo);
-    return total; // Retorna o total de registros carregados com sucesso
+    return total;
 }
 
-// SALVA TODOS OS REGISTROS DO VETOR DE VOLTA PARA O ARQUIVO (Write / Persist√™ncia)
 bool salvarTodosPacientes(Paciente lista[], int total, int indiceIgnorar) {
     arquivo = fopen(nomeArquivo, "w");
     if (arquivo == NULL) {
         return false;
     }
 
-    // Escreve o cabe√ßalho padr√£o do CSV
     fprintf(arquivo, "Codigo,NomeDono,Telefone,Especie,Nome,Idade,Sexo,Raca,Peso,Castrado\n");
-    
     for (int i = 0; i < total; i++) {
-        // Se indiceIgnorar for v√°lido, pula aquele registro espec√≠fico (usado na exclus√£o)
         if (i != indiceIgnorar) {
             fprintf(arquivo, "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n",
                     lista[i].Codigo,
@@ -356,55 +309,49 @@ bool salvarTodosPacientes(Paciente lista[], int total, int indiceIgnorar) {
     return true;
 }
 
-// ========================================================================== */
-//                     FUN√á√ïES DE INTERFACE E EXIBI√á√ÉO                         */
-// ========================================================================== */
-
 void exibirAvisoSemCadastro(const char *tituloSecao) {
     printf(MAGENTA "\n=== %s ===\n" RESET, tituloSecao);
-    printf(AMARELO "\nAviso: N√£o h√° nenhum paciente cadastrado no sistema.\n" RESET);
+    printf(AMARELO "\nAviso: N„o h· nenhum paciente cadastrado no sistema.\n" RESET);
     printf(CIANO "\nPressione ENTER para voltar ao menu..." RESET);
     getchar();
 }
 
-// Exibe os dados detalhados de um paciente formatados em formato de "Card"
 void imprimirCardPaciente(int numero, Paciente p) {
-    printf(AMARELO "\nPaciente #%d (C√≥digo: %s)\n" RESET, numero, p.Codigo);
+    printf(AMARELO "\nPaciente #%d (CÛdigo: %s)\n" RESET, numero, p.Codigo);
     printf(CIANO "  Nome do Dono: " RESET "%s\n", p.NomeDono);
     printf(CIANO "  Telefone:     " RESET "%s\n", p.Telefone);
-    printf(CIANO "  Esp√©cie:      " RESET "%s\n", p.Especie);
+    printf(CIANO "  EspÈcie:      " RESET "%s\n", p.Especie);
     printf(CIANO "  Nome:         " RESET "%s\n", p.Nome);
     printf(CIANO "  Idade:        " RESET "%s\n", p.Idade);
     printf(CIANO "  Sexo:         " RESET "%s\n", p.Sexo);
-    printf(CIANO "  Ra√ßa:         " RESET "%s\n", p.Raca);
+    printf(CIANO "  RaÁa:         " RESET "%s\n", p.Raca);
     printf(CIANO "  Peso:         " RESET "%s\n", p.Peso);
     printf(CIANO "  Castrado?:    " RESET "%s\n", p.Castrado);
     printf(AZUL "-------------------------------------------------------------\n" RESET);
 }
 
-// Fun√ß√£o de busca unificada (por C√≥digo, Nome do Paciente, Nome do Dono ou Esp√©cie) com suporte a m√∫ltiplos resultados
 int buscarIndicePaciente(Paciente lista[], int total, const char *acaoTexto) {
-    printf("\t" CIANO "1" RESET " - Pesquisar por C√≥digo de Cadastro\n");
+    printf("\t" CIANO "1" RESET " - Pesquisar por CÛdigo de Cadastro\n");
     printf("\t" CIANO "2" RESET " - Pesquisar por Nome do Paciente\n");
     printf("\t" CIANO "3" RESET " - Pesquisar por Nome do Dono\n");
-    printf("\t" CIANO "4" RESET " - Pesquisar por Esp√©cie\n");
+    printf("\t" CIANO "4" RESET " - Pesquisar por EspÈcie\n");
     printf("\t" VERMELHO "0" RESET " - Cancelar e voltar ao menu\n\n");
 
     int tipoBusca = lerInteiroValido("Como deseja localizar o paciente? ", 0, 4);
     if (tipoBusca == 0) {
-        printf(CIANO "\nOpera√ß√£o cancelada.\n" RESET);
+        printf(CIANO "\nOperaÁ„o cancelada.\n" RESET);
         return -1;
     }
 
     char termoBusca[50];
     if (tipoBusca == 1) {
-        lerTextoSeguro("\nDigite o C√≥digo de Cadastro (ex: 261101): ", termoBusca, sizeof(termoBusca));
+        lerTextoSeguro("\nDigite o CÛdigo de Cadastro (ex: 1, 2...): ", termoBusca, sizeof(termoBusca));
     } else if (tipoBusca == 2) {
         lerTextoSeguro("\nDigite o Nome do paciente: ", termoBusca, sizeof(termoBusca));
     } else if (tipoBusca == 3) {
         lerTextoSeguro("\nDigite o Nome do dono: ", termoBusca, sizeof(termoBusca));
     } else {
-        lerTextoSeguro("\nDigite a Esp√©cie do paciente: ", termoBusca, sizeof(termoBusca));
+        lerTextoSeguro("\nDigite a EspÈcie do paciente: ", termoBusca, sizeof(termoBusca));
     }
 
     char termoLower[50];
@@ -414,7 +361,6 @@ int buscarIndicePaciente(Paciente lista[], int total, const char *acaoTexto) {
     int indicesEncontrados[500];
     int qtdEncontrados = 0;
 
-    // Varre o vetor procurando correspond√™ncias parciais ou totais (strstr)
     for (int i = 0; i < total; i++) {
         char campoComparar[50];
         if (tipoBusca == 1) {
@@ -439,10 +385,9 @@ int buscarIndicePaciente(Paciente lista[], int total, const char *acaoTexto) {
     }
 
     if (qtdEncontrados == 1) {
-        return indicesEncontrados[0]; // Retorna diretamente se houver apenas um resultado
+        return indicesEncontrados[0];
     }
 
-    // Se houver mais de um resultado, exibe a lista para o usu√°rio escolher o correto
     printf(MAGENTA "\n=== PACIENTES ENCONTRADOS (%d) ===\n" RESET, qtdEncontrados);
     for (int i = 0; i < qtdEncontrados; i++) {
         imprimirCardPaciente(i + 1, lista[indicesEncontrados[i]]);
@@ -450,21 +395,20 @@ int buscarIndicePaciente(Paciente lista[], int total, const char *acaoTexto) {
     printf(VERMELHO "[0] Cancelar e voltar ao menu\n\n" RESET);
 
     char promptEscolha[120];
-    snprintf(promptEscolha, sizeof(promptEscolha), "Qual o n√∫mero (#) do paciente acima deseja %s? ", acaoTexto);
+    snprintf(promptEscolha, sizeof(promptEscolha), "Qual o n˙mero (#) do paciente acima deseja %s? ", acaoTexto);
 
     int escolha = lerInteiroValido(promptEscolha, 0, qtdEncontrados);
     if (escolha == 0) {
-        printf(CIANO "\nOpera√ß√£o cancelada.\n" RESET);
+        printf(CIANO "\nOperaÁ„o cancelada.\n" RESET);
         return -1;
     }
 
     return indicesEncontrados[escolha - 1];
 }
 
-// Menu principal interativo
 void menu() {
     printf(CIANO "\n\t========================================\n");
-    printf("\t            MENU DE OP√á√ïES\n");
+    printf("\t            MENU DE OP«’ES\n");
     printf("\t========================================\n" RESET);
 
     printf("\n"
@@ -477,14 +421,9 @@ void menu() {
     "\n");
 }
 
-// ========================================================================== */
-//                     OPERA√á√ïES PRINCIPAIS DO CRUD                           */
-// ========================================================================== */
-
-// 1. CREATE (Cadastrar novo paciente)
 bool receberDadosPaciente(Paciente *p) {
     gerarProximoCodigo(p->Codigo);
-    printf(AZUL "Gerando c√≥digo de cadastro: %s\n" RESET, p->Codigo);
+    printf(AZUL "Gerando cÛdigo de cadastro: %s\n" RESET, p->Codigo);
     printf(AMARELO "(Digite \"cancel\" em qualquer campo para cancelar)\n" RESET);
 
     if (!lerTextoCancelavel("\nInsira o Nome do Dono: ", p->NomeDono, sizeof(p->NomeDono))) return false;
@@ -492,7 +431,7 @@ bool receberDadosPaciente(Paciente *p) {
 
     if (!lerTextoCancelavel("Insira o Telefone de Contato: ", p->Telefone, sizeof(p->Telefone))) return false;
 
-    if (!lerTextoCancelavel("Insira a Esp√©cie: ", p->Especie, sizeof(p->Especie))) return false;
+    if (!lerTextoCancelavel("Insira a EspÈcie: ", p->Especie, sizeof(p->Especie))) return false;
     formatarSeApenasLetras(p->Especie);
 
     if (!lerTextoCancelavel("Insira o Nome do Paciente: ", p->Nome, sizeof(p->Nome))) return false;
@@ -502,23 +441,23 @@ bool receberDadosPaciente(Paciente *p) {
     formatarSeApenasLetras(p->Idade);
 
     char tempSexo = lerCharCancelavel(
-        "Insira o sexo ([F] para f√™mea ou [M] para macho): ",
+        "Insira o sexo ([F] para fÍmea ou [M] para macho): ",
         "FfMm",
-        "OP√á√ÉO INV√ÅLIDA! Digite apenas F ou M (ou \"cancel\" para sair)."
+        "OP«√O INV¡LIDA! Digite apenas F ou M (ou \"cancel\" para sair)."
     );
     if (tempSexo == '\0') return false;
     strcpy(p->Sexo, (tempSexo == 'F' || tempSexo == 'f') ? "Femea" : "Macho");
 
-    if (!lerTextoCancelavel("Insira a Ra√ßa: ", p->Raca, sizeof(p->Raca))) return false;
+    if (!lerTextoCancelavel("Insira a RaÁa: ", p->Raca, sizeof(p->Raca))) return false;
     formatarSeApenasLetras(p->Raca);
 
     if (!lerTextoCancelavel("Insira o Peso e a Medida (ex: 200 gramas, 4 kg): ", p->Peso, sizeof(p->Peso))) return false;
     formatarSeApenasLetras(p->Peso);
 
     char tempCastrado = lerCharCancelavel(
-        "√â castrado? ([S] para Sim [N] para N√£o): ",
+        "… castrado? ([S] para Sim [N] para N„o): ",
         "SsNn",
-        "OP√á√ÉO INV√ÅLIDA! Digite apenas S ou N (ou \"cancel\" para sair)."
+        "OP«√O INV¡LIDA! Digite apenas S ou N (ou \"cancel\" para sair)."
     );
     if (tempCastrado == '\0') return false;
     strcpy(p->Castrado, (tempCastrado == 'S' || tempCastrado == 's') ? "Castrado" : "Nao Castrado");
@@ -550,7 +489,6 @@ void escreverCadastro() {
         fclose(arquivo);
     }
 
-    // Grava os dados no final do arquivo (modo append "a")
     arquivo = fopen(nomeArquivo, "a");
     if (arquivo == NULL) {
         printf(VERMELHO "=== Erro ao abrir o arquivo para adicionar dados! ===\n" RESET);
@@ -570,7 +508,7 @@ void escreverCadastro() {
             paciente.Castrado);
 
     fclose(arquivo);
-    printf(VERDE "\n=== Paciente cadastrado com sucesso! C√≥digo gerado: %s ===\n" RESET, paciente.Codigo);
+    printf(VERDE "\n=== Paciente cadastrado com sucesso! CÛdigo gerado: %s ===\n" RESET, paciente.Codigo);
     memset(&paciente, 0, sizeof(Paciente));
 }
 
@@ -580,11 +518,10 @@ void cadastrarPaciente() {
         escreverCadastro();
     } else {
         memset(&paciente, 0, sizeof(Paciente));
-        printf(VERMELHO "\n=== Cadastro cancelado pelo usu√°rio. ===\n" RESET);
+        printf(VERMELHO "\n=== Cadastro cancelado pelo usu·rio. ===\n" RESET);
     }
 }
 
-// 2. UPDATE (Atualizar cadastro existente)
 bool atualizarCadastro() {
     Paciente lista[500];
     int total = carregarPacientes(lista, 500);
@@ -597,31 +534,33 @@ bool atualizarCadastro() {
     printf(MAGENTA "\n=== ATUALIZAR CADASTRO ===\n\n" RESET);
     int idx = buscarIndicePaciente(lista, total, "atualizar");
 
-    if (idx < 0) return true;
+    if (idx < 0) {
+        return true;
+    }
 
-    Paciente backupOriginal = lista[idx]; // Mant√©m backup caso o usu√°rio desfa√ßa as altera√ß√µes
+    Paciente backupOriginal = lista[idx];
     bool editando = true;
     bool houveAlteracao = false;
     bool salvarAlteracoes = false;
 
     while (editando) {
-        printf(AMARELO "\n=== EDITANDO PACIENTE: %s (C√≥digo: %s) ===\n" RESET, lista[idx].Nome, lista[idx].Codigo);
+        printf(AMARELO "\n=== EDITANDO PACIENTE: %s (CÛdigo: %s) ===\n" RESET, lista[idx].Nome, lista[idx].Codigo);
         imprimirCardPaciente(1, lista[idx]);
 
         printf(MAGENTA "\t1" RESET " - Nome do Dono\n");
         printf(MAGENTA "\t2" RESET " - Telefone\n");
-        printf(MAGENTA "\t3" RESET " - Esp√©cie\n");
+        printf(MAGENTA "\t3" RESET " - EspÈcie\n");
         printf(MAGENTA "\t4" RESET " - Nome do Paciente\n");
         printf(MAGENTA "\t5" RESET " - Idade\n");
         printf(MAGENTA "\t6" RESET " - Sexo\n");
-        printf(MAGENTA "\t7" RESET " - Ra√ßa\n");
+        printf(MAGENTA "\t7" RESET " - RaÁa\n");
         printf(MAGENTA "\t8" RESET " - Peso\n");
         printf(MAGENTA "\t9" RESET " - Castrado?\n");
         printf(MAGENTA "\t10" RESET " - Atualizar TODOS os campos\n");
-        printf(VERDE "\t11" RESET " - Concluir e salvar altera√ß√µes\n");
-        printf(VERMELHO "\t0" RESET " - Sair e desfazer todas as altera√ß√µes\n\n");
+        printf(VERDE "\t11" RESET " - Concluir e salvar alteraÁıes\n");
+        printf(VERMELHO "\t0" RESET " - Sair e desfazer todas as alteraÁıes\n\n");
 
-        int campo = lerInteiroValido("Qual informa√ß√£o deseja alterar? ", 0, 11);
+        int campo = lerInteiroValido("Qual informaÁ„o deseja alterar? ", 0, 11);
 
         switch (campo) {
             case 1:
@@ -634,7 +573,7 @@ bool atualizarCadastro() {
                 houveAlteracao = true;
                 break;
             case 3:
-                lerTextoSeguro("\nNova Esp√©cie: ", lista[idx].Especie, sizeof(lista[idx].Especie));
+                lerTextoSeguro("\nNova EspÈcie: ", lista[idx].Especie, sizeof(lista[idx].Especie));
                 formatarSeApenasLetras(lista[idx].Especie);
                 houveAlteracao = true;
                 break;
@@ -649,13 +588,13 @@ bool atualizarCadastro() {
                 houveAlteracao = true;
                 break;
             case 6: {
-                char s = lerCharValido("\nNovo Sexo ([F] F√™mea / [M] Macho): ", "FfMm", "OP√á√ÉO INV√ÅLIDA! Digite apenas F ou M.");
+                char s = lerCharValido("\nNovo Sexo ([F] FÍmea / [M] Macho): ", "FfMm", "OP«√O INV¡LIDA! Digite apenas F ou M.");
                 strcpy(lista[idx].Sexo, (s == 'F' || s == 'f') ? "Femea" : "Macho");
                 houveAlteracao = true;
                 break;
             }
             case 7:
-                lerTextoSeguro("\nNova Ra√ßa: ", lista[idx].Raca, sizeof(lista[idx].Raca));
+                lerTextoSeguro("\nNova RaÁa: ", lista[idx].Raca, sizeof(lista[idx].Raca));
                 formatarSeApenasLetras(lista[idx].Raca);
                 houveAlteracao = true;
                 break;
@@ -665,62 +604,88 @@ bool atualizarCadastro() {
                 houveAlteracao = true;
                 break;
             case 9: {
-                char c = lerCharValido("\n√â castrado? ([S] Sim / [N] N√£o): ", "SsNn", "OP√á√ÉO INV√ÅLIDA! Digite apenas S ou N.");
+                char c = lerCharValido("\n… castrado? ([S] Sim / [N] N„o): ", "SsNn", "OP«√O INV¡LIDA! Digite apenas S ou N.");
                 strcpy(lista[idx].Castrado, (c == 'S' || c == 's') ? "Castrado" : "Nao Castrado");
                 houveAlteracao = true;
                 break;
             }
             case 10: {
                 char codigoAtual[20];
-                strcpy(codigoAtual, lista[idx].Codigo);
+                strcpy(codigoAtual, lista[idx].Codigo); 
                 Paciente backupParcial = lista[idx];
                 if (receberDadosPaciente(&lista[idx])) {
-                    strcpy(lista[idx].Codigo, codigoAtual); // Preserva o c√≥digo original
+                    strcpy(lista[idx].Codigo, codigoAtual); 
                     houveAlteracao = true;
                 } else {
                     lista[idx] = backupParcial;
+                    printf(AMARELO "\nEdiÁ„o completa cancelada. Os dados anteriores desta etapa foram mantidos.\n" RESET);
                 }
                 break;
             }
             case 11: {
                 if (!houveAlteracao) {
+                    printf(CIANO "\nNenhuma alteraÁ„o foi feita atÈ o momento.\n" RESET);
                     editando = false;
                     salvarAlteracoes = false;
                     break;
                 }
-                char confirmaSalvar = lerCharValido("\nDeseja SALVAR as altera√ß√µes? ([S] Sim / [N] N√£o): ", "SsNn", "Digite S ou N.");
+
+                char confirmaSalvar = lerCharValido(
+                    "\nTem certeza que deseja SALVAR as alteraÁıes realizadas? ([S] Sim / [N] N„o): ",
+                    "SsNn",
+                    "OP«√O INV¡LIDA! Digite apenas S para Sim ou N para N„o."
+                );
+
                 if (confirmaSalvar == 'S' || confirmaSalvar == 's') {
                     salvarAlteracoes = true;
                     editando = false;
+                } else {
+                    printf(AMARELO "\nSalvamento cancelado. VocÍ voltou para a ediÁ„o do paciente.\n" RESET);
                 }
                 break;
             }
             case 0: {
                 if (!houveAlteracao) {
+                    printf(CIANO "\nSaindo da ediÁ„o sem alteraÁıes.\n" RESET);
                     editando = false;
                     salvarAlteracoes = false;
                     break;
                 }
-                char confirmaDesfazer = lerCharValido("\nDeseja sair e DESFAZER as altera√ß√µes? ([S] Sim / [N] N√£o): ", "SsNn", "Digite S ou N.");
+
+                char confirmaDesfazer = lerCharValido(
+                    "\nATEN«√O: Todas as alteraÁıes feitas ser„o perdidas! Deseja realmente sair e desfazer? ([S] Sim / [N] N„o): ",
+                    "SsNn",
+                    "OP«√O INV¡LIDA! Digite apenas S para Sim ou N para N„o."
+                );
+
                 if (confirmaDesfazer == 'S' || confirmaDesfazer == 's') {
                     lista[idx] = backupOriginal;
                     salvarAlteracoes = false;
                     editando = false;
+                    printf(VERMELHO "\n=== Todas as alteraÁıes foram desfeitas. ===\n" RESET);
+                } else {
+                    printf(AMARELO "\nSaÌda cancelada. Suas alteraÁıes continuam na tela de ediÁ„o.\n" RESET);
                 }
                 break;
             }
         }
+
+        if (editando && houveAlteracao && campo >= 1 && campo <= 9) {
+            printf(VERDE "\nCampo atualizado! Edite outro campo, digite 11 para salvar ou 0 para desfazer.\n" RESET);
+        }
     }
 
     if (salvarAlteracoes) {
-        salvarTodosPacientes(lista, total, -1);
-        printf(VERDE "\n=== Cadastro atualizado com sucesso! ===\n" RESET);
+        if (salvarTodosPacientes(lista, total, -1)) {
+            printf(VERDE "\n=== Cadastro de \"%s\" atualizado e salvo com sucesso! ===\n" RESET, lista[idx].Nome);
+        } else {
+            printf(VERMELHO "\n=== Erro ao salvar alteraÁıes no arquivo! ===\n" RESET);
+        }
     }
 
     return true;
 }
 
-// 3. READ (Listar todos os cadastros)
 void imprimirCadastros() {
     Paciente lista[500];
     int total = carregarPacientes(lista, 500);
@@ -737,11 +702,10 @@ void imprimirCadastros() {
         imprimirCardPaciente(i + 1, lista[i]);
     }
 
-    printf(VERDE "\nLeitura conclu√≠da! Pressione ENTER para voltar ao menu..." RESET);
+    printf(VERDE "\nLeitura concluÌda! Pressione ENTER para voltar ao menu..." RESET);
     getchar();
 }
 
-// Pesquisa geral exibindo todos os resultados correspondentes
 void pesquisarPaciente() {
     Paciente lista[500];
     int total = carregarPacientes(lista, 500);
@@ -752,15 +716,20 @@ void pesquisarPaciente() {
     }
 
     char termoBusca[50];
+
     printf(MAGENTA "\n=== PESQUISAR PACIENTE ===\n" RESET);
-    printf("\t" AZUL "1" RESET " - Pesquisar por C√≥digo de Cadastro\n");
+    printf("\t" AZUL "1" RESET " - Pesquisar por CÛdigo de Cadastro\n");
     printf("\t" AZUL "2" RESET " - Pesquisar por Nome do Paciente\n");
     printf("\t" AZUL "3" RESET " - Pesquisar por Nome do Dono\n");
-    printf("\t" AZUL "4" RESET " - Pesquisar por Esp√©cie\n");
+    printf("\t" AZUL "4" RESET " - Pesquisar por EspÈcie\n");
     printf("\t" VERMELHO "0" RESET " - Voltar ao menu\n\n");
 
     int tipoBusca = lerInteiroValido("Escolha o tipo de busca: ", 0, 4);
-    if (tipoBusca == 0) return;
+
+    if (tipoBusca == 0) {
+        printf(VERMELHO "\nBusca cancelada.\n" RESET);
+        return;
+    }
 
     lerTextoSeguro("Digite o termo para pesquisa: ", termoBusca, sizeof(termoBusca));
 
@@ -769,16 +738,22 @@ void pesquisarPaciente() {
     paraMinusculo(termoLower);
 
     int encontrados = 0;
+
     printf(MAGENTA "\n=== RESULTADOS DA BUSCA ===\n" RESET);
 
     for (int i = 0; i < total; i++) {
         char campoComparar[50];
-        if (tipoBusca == 1) strcpy(campoComparar, lista[i].Codigo);
-        else if (tipoBusca == 2) strcpy(campoComparar, lista[i].Nome);
-        else if (tipoBusca == 3) strcpy(campoComparar, lista[i].NomeDono);
-        else strcpy(campoComparar, lista[i].Especie);
-
+        if (tipoBusca == 1) {
+            strcpy(campoComparar, lista[i].Codigo);
+        } else if (tipoBusca == 2) {
+            strcpy(campoComparar, lista[i].Nome);
+        } else if (tipoBusca == 3) {
+            strcpy(campoComparar, lista[i].NomeDono);
+        } else {
+            strcpy(campoComparar, lista[i].Especie);
+        }
         paraMinusculo(campoComparar);
+
         if (strstr(campoComparar, termoLower) != NULL) {
             imprimirCardPaciente(++encontrados, lista[i]);
         }
@@ -794,7 +769,6 @@ void pesquisarPaciente() {
     getchar();
 }
 
-// 4. DELETE (Apagar cadastro)
 bool apagarCadastro() {
     Paciente lista[500];
     int total = carregarPacientes(lista, 500);
@@ -807,26 +781,31 @@ bool apagarCadastro() {
     printf(MAGENTA "\n=== APAGAR CADASTRO ===\n" RESET);
     int indiceAlvo = buscarIndicePaciente(lista, total, "apagar");
 
-    if (indiceAlvo < 0) return true;
+    if (indiceAlvo < 0) {
+        return true;
+    }
 
     printf(MAGENTA "\n=== PACIENTE SELECIONADO ===\n" RESET);
     imprimirCardPaciente(1, lista[indiceAlvo]);
 
     char promptConfirma[150];
     snprintf(promptConfirma, sizeof(promptConfirma), 
-             "\nDeseja apagar o cadastro de \"%s\" (C√≥digo: %s)? ([S] Sim / [N] N√£o): ", 
+             "\nTem certeza que deseja apagar o cadastro de \"%s\" (CÛdigo: %s)? ([S] Sim / [N] N„o): ", 
              lista[indiceAlvo].Nome, lista[indiceAlvo].Codigo);
 
-    char confirma = lerCharValido(promptConfirma, "SsNn", "Digite S ou N.");
+    char confirma = lerCharValido(
+        promptConfirma,
+        "SsNn",
+        "OP«√O INV¡LIDA! Digite apenas S para Sim ou N para N„o."
+    );
 
     if (confirma != 'S' && confirma != 's') {
-        printf(VERMELHO "\nOpera√ß√£o cancelada.\n" RESET);
+        printf(VERMELHO "\nOperaÁ„o cancelada. Nenhum dado foi apagado.\n" RESET);
         return true;
     }
 
-    // Reescreve o arquivo ignorando o √≠ndice selecionado
     if (salvarTodosPacientes(lista, total, indiceAlvo)) {
-        printf(VERDE "\n=== Cadastro apagado com sucesso! ===\n" RESET);
+        printf(VERDE "\n=== Cadastro de \"%s\" apagado com sucesso! ===\n" RESET, lista[indiceAlvo].Nome);
     } else {
         printf(VERMELHO "\n=== Erro ao atualizar o arquivo! ===\n" RESET);
     }
@@ -834,7 +813,6 @@ bool apagarCadastro() {
     return true;
 }
 
-// Fun√ß√µes utilit√°rias de terminal
 void limparTela() {
     #ifdef _WIN32
         system("cls");
@@ -856,50 +834,53 @@ void transicao() {
     limparTela();
 }
 
-// ========================================================================== */
-//                            FUN√á√ÉO PRINCIPAL (MAIN)                         */
-// ========================================================================== */
+// FUN«√O PRINCIPAL
 int main() {
-    setlocale(LC_ALL, "portuguese"); // Garante acentua√ß√£o correta
+    setlocale(LC_ALL, "portuguese");
     ativarCoresWindows();
 
     printf(VERDE "\n\t========================================\n");
-    printf("\t   BEM-VINDO AO SISTEMA VETERIN√ÅRIO!\n");
+    printf("\t   BEM-VINDO AO SISTEMA VETERIN¡RIO!\n");
     printf("\t========================================\n" RESET);
 
-    // Loop principal do sistema controlado por menu
     while (!parar) {
         menu();
-        opcao = lerInteiroValido("Insira a op√ß√£o desejada: ", 0, 5);
+        opcao = lerInteiroValido("Insira a opÁ„o desejada: ", 0, 5);
 
         switch (opcao) {
-            case 1:
+            case 1: // Cadastrar Paciente
                 limparTela();
                 cadastrarPaciente();
                 transicao();
                 break;
-            case 2:
+            case 2: // Atualizar Cadastro
                 limparTela();
-                if (atualizarCadastro()) transicao();
-                else limparTela();
+                if (atualizarCadastro()) {
+                    transicao();
+                } else {
+                    limparTela();
+                }
                 break;
-            case 3:
+            case 3: // Imprimir Cadastros
                 limparTela();
                 imprimirCadastros();
                 limparTela();
                 break;
-            case 4:
+            case 4: // Pesquisar Paciente
                 limparTela();
                 pesquisarPaciente();
                 limparTela();
                 break;
-            case 5:
+            case 5: // Apagar Cadastro
                 limparTela();
-                if (apagarCadastro()) transicao();
-                else limparTela();
+                if (apagarCadastro()) {
+                    transicao();
+                } else {
+                    limparTela();
+                }
                 break;
-            case 0:
-                printf(VERDE "\nSaindo do sistema... At√© logo!\n" RESET);
+            case 0: // Sair
+                printf(VERDE "\nSaindo do sistema... AtÈ logo!\n" RESET);
                 parar = true;
                 break;
         }
