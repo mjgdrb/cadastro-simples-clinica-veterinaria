@@ -28,7 +28,7 @@
 
 // ESTRUTURA DE DADOS (STRUCT) DO PACIENTE
 typedef struct {
-    char Codigo[20];       // Código sequencial numérico (ex: "1", "2", "3"...)
+    char Codigo[20];       
     char NomeDono[50];     
     char Telefone[30];     
     char Especie[50];      
@@ -45,7 +45,7 @@ const char *nomeArquivo = "pacientes.csv";
 const char *nomeArquivoContador = "contador.txt";   
 
 // ========================================================================== */
-//                     FUNÇÕES AUXILIARES DE VALIDAÇÃO E FORMATAÇÃO            */
+//                     FUNÇÕES AUXILIARES DE VALIDAÇÃO E FORMATAÇÃO           */
 // ========================================================================== */
 
 void paraMinusculo(char *str) {
@@ -311,7 +311,7 @@ bool salvarTodosPacientes(Paciente lista[], int total, int indiceIgnorar) {
 }
 
 // ========================================================================== */
-//                     FUNÇÕES DE INTERFACE E EXIBIÇÃO                         */
+//                     FUNÇÕES DE INTERFACE E EXIBIÇÃO                        */
 // ========================================================================== */
 
 void exibirAvisoSemCadastro(const char *tituloSecao) {
